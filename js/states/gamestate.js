@@ -242,10 +242,10 @@ class GameState extends State {
     );
   };
   renderFps(ctx) {
-    ctx.font = "24px Monospace";
-    ctx.fillStyle = "rgba(0,255,0,0.5)";
+    ctx.font = "18px Monospace";
+    ctx.fillStyle = "rgb(0,255,0)";
     ctx.textAlign = "right";
-    ctx.fillText(this.fps, this.screenSize.x, this.screenSize.y);
+    ctx.fillText(this.fps, this.screenSize.x, this.screenSize.y - 2);
   };
   renderLoad(ctx) {
     this.renderMessageScreen(ctx, "Loading...");
