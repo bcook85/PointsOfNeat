@@ -320,9 +320,9 @@ class GameState extends State {
   };
   updatePlay() {
     for (let i = 0; i < this.gameSpeed; i++) {
-      this.redTeam.update(this.groupTick, this.blueTeam.players, this.map);
-      this.blueTeam.update(this.groupTick, this.redTeam.players, this.map);
-      this.map.update(this.groupTick, this.redTeam.players, this.blueTeam.players);
+      this.redTeam.update(this.groupTick, this.blueTeam.getLivingPlayers(), this.map);
+      this.blueTeam.update(this.groupTick, this.redTeam.getLivingPlayers(), this.map);
+      this.map.update(this.groupTick, this.redTeam.getLivingPlayers(), this.blueTeam.getLivingPlayers());
       this.groupTick += 1;
       if (this.groupTick >= GameState.MAX_GROUP_TICK) {
         this.currentPhase = GameState.PHASES.reset;

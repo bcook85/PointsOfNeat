@@ -132,4 +132,13 @@ class Team {
       }
     }
   };
+  getLivingPlayers() {
+    let alive = [];
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].alive) {
+        alive.push(this.players[i]);
+      }
+    }
+    return alive;
+  };
 };

@@ -247,29 +247,33 @@ class Player extends Ball {
       }
       // Allies
       for (let a = 0; a < allies.length; a++) {
-        if (this.id != allies[a].id && Ball.vsRay(
-          this.pos
-          ,this.pos.add(Vector.fromAngle(playerDir).mul(maxDistance))
-          ,allies[a]
-        )) {
-          let distanceToAlly = this.pos.getDistance(allies[a].pos); // imperfect
-          if (distanceToAlly <= maxDistance) {
-            currentVisionType = Player.VISION_TYPES.ally;
-            maxDistance = distanceToAlly;
+        if (allies[a].alive) {
+          if (this.id != allies[a].id && Ball.vsRay(
+            this.pos
+            ,this.pos.add(Vector.fromAngle(playerDir).mul(maxDistance))
+            ,allies[a]
+          )) {
+            let distanceToAlly = this.pos.getDistance(allies[a].pos); // imperfect
+            if (distanceToAlly <= maxDistance) {
+              currentVisionType = Player.VISION_TYPES.ally;
+              maxDistance = distanceToAlly;
+            }
           }
         }
       }
       // Enemies
       for (let e = 0; e < enemies.length; e++) {
-        if (Ball.vsRay(
-          this.pos
-          ,this.pos.add(Vector.fromAngle(playerDir).mul(maxDistance))
-          ,enemies[e]
-        )) {
-          let distanceToEnemy = this.pos.getDistance(enemies[e].pos); // imperfect
-          if (distanceToEnemy <= maxDistance) {
-            currentVisionType = Player.VISION_TYPES.enemy;
-            maxDistance = distanceToEnemy;
+        if (enemies[e].alive) {
+          if (Ball.vsRay(
+            this.pos
+            ,this.pos.add(Vector.fromAngle(playerDir).mul(maxDistance))
+            ,enemies[e]
+          )) {
+            let distanceToEnemy = this.pos.getDistance(enemies[e].pos); // imperfect
+            if (distanceToEnemy <= maxDistance) {
+              currentVisionType = Player.VISION_TYPES.enemy;
+              maxDistance = distanceToEnemy;
+            }
           }
         }
       }
