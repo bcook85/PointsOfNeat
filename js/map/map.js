@@ -128,9 +128,9 @@ class Map {
       }
     }
   };
-  reset(gameTick) {
+  reset() {
     for (let i = 0; i < this.controlPoints.length; i++) {
-      this.controlPoints[i].reset(gameTick);
+      this.controlPoints[i].reset();
     }
   };
   getTeamControlPoints(teamId) {

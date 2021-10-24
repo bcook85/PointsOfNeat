@@ -14,6 +14,8 @@ class ControlPoint extends Ball {
     this.cappingTeam = GameState.TEAM_ID.neutral;
 
     this.captureAmount = 0;
+    this.redCaptureAmount = 0;
+    this.blueCaptureAmount = 0;
     this.captureAmountPerTick = 0.034;
     this.captureTickTime = 6;
     this.captureLast = 0;
@@ -62,15 +64,18 @@ class ControlPoint extends Ball {
             ,Math.floor(scale * 0.5)
             ,Math.floor(scale * 0.125)
           );
+          let capAmount = 0;
           if (this.cappingTeam == GameState.TEAM_ID.red) {
             ctx.fillStyle = "rgb(255,0,0)";
+            capAmount = this.redCaptureAmount;
           } else if (this.cappingTeam == GameState.TEAM_ID.blue) {
             ctx.fillStyle = "rgb(0,0,255)";
+            capAmount = this.blueCaptureAmount;
           }
           ctx.fillRect(
             Math.floor(scale * -0.25)
             ,Math.floor(scale * -1.125)
-            ,Math.floor(scale * 0.5 * this.captureAmount)
+            ,Math.floor(scale * 0.5 * capAmount)
             ,Math.floor(scale * 0.125)
           );
         }
@@ -82,47 +87,52 @@ class ControlPoint extends Ball {
     switch (this.currentOwner) {
       case GameState.TEAM_ID.red:
         if (blueTeamCapping && !redTeamCapping) {
-          this.captureAmount -= this.captureAmountPerTick;
-        }
-        if (this.captureAmount <= 0) {
-          this.currentOwner = GameState.TEAM_ID.neutral;
-          this.captureAmount = 0;
+          this.redCaptureAmount -= this.captureAmountPerTick;
+          if (this.redCaptureAmount <= 0) {
+            this.redCaptureAmount = 0;
+            this.blueCaptureAmount = 0;
+            this.currentOwner = GameState.TEAM_ID.neutral;
+          }
         }
         break;
       case GameState.TEAM_ID.blue:
         if (redTeamCapping && !blueTeamCapping) {
-          this.captureAmount -= this.captureAmountPerTick;
-        }
-        if (this.captureAmount <= 0) {
-          this.currentOwner = GameState.TEAM_ID.neutral;
-          this.captureAmount = 0;
+          this.blueCaptureAmount -= this.captureAmountPerTick;
+          if (this.blueCaptureAmount <= 0) {
+            this.blueCaptureAmount = 0;
+            this.redCaptureAmount = 0;
+            this.currentOwner = GameState.TEAM_ID.neutral;
+          }
         }
         break;
       case GameState.TEAM_ID.neutral:
         if (redTeamCapping && !blueTeamCapping) {
-          this.captureAmount += this.captureAmountPerTick;
+          this.redCaptureAmount += this.captureAmountPerTick;
           this.cappingTeam = GameState.TEAM_ID.red;
-          if (this.captureAmount >= 1) {
+          if (this.redCaptureAmount >= 1) {
             this.currentOwner = GameState.TEAM_ID.red;
             this.cappingTeam = GameState.TEAM_ID.neutral;
-            this.captureAmount = 1;
+            this.redCaptureAmount = 1;
+            this.blueCaptureAmount = 0;
           }
         } else if (blueTeamCapping && !redTeamCapping) {
-          this.captureAmount += this.captureAmountPerTick;
+          this.blueCaptureAmount += this.captureAmountPerTick;
           this.cappingTeam = GameState.TEAM_ID.blue;
-          if (this.captureAmount >= 1) {
+          if (this.blueCaptureAmount >= 1) {
             this.currentOwner = GameState.TEAM_ID.blue;
             this.cappingTeam = GameState.TEAM_ID.neutral;
-            this.captureAmount = 1;
+            this.blueCaptureAmount = 1;
+            this.redCaptureAmount = 0;
           }
         }
         break;
     }    
   };
-  reset(gameTick) {
+  reset() {
     this.captureLast = -Infinity;
-    this.captureAmount = 0;
-    this.teamOwner = GameState.TEAM_ID.neutral;
+    this.redCaptureAmount = 0;
+    this.blueCaptureAmount = 0;
+    this.currentOwner = GameState.TEAM_ID.neutral;
     this.cappingTeam = GameState.TEAM_ID.neutral;
   };
 };

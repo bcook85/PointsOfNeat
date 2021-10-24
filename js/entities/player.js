@@ -83,6 +83,15 @@ class Player extends Ball {
     this.attackLast = -Infinity;
     this.deadLast = -Infinity;
   };
+  respawn() {
+    this.pos = new Vector(this.home.x, this.home.y);
+    this.vel = new Vector(0.0, 0.0);
+    this.direction = Math.random() * Math.PI * 2;
+    this.hp = this.maxHP;
+    this.alive = true;
+    this.attackLast = -Infinity;
+    this.deadLast = -Infinity;
+  };
   render(ctx, offset, scale) {
     ctx.save();
     // Move to Draw Position

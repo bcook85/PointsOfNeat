@@ -109,7 +109,7 @@ class Team {
           this.createBullet(i, this.players[i].pos, this.players[i].direction);
         }
       } else if (gameTick >= this.players[i].deadLast + Team.RESPAWN_TIME) {
-        this.players[i].reset(this.spawnLocation);
+        this.players[i].respawn(this.spawnLocation);
       }
     }
     // Bullets
