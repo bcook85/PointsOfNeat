@@ -124,6 +124,7 @@ class Map {
             }
           }
         }
+        this.controlPoints[i].contested = redTeamCapping && blueTeamCapping;
         this.controlPoints[i].update(redTeamCapping, blueTeamCapping);
       }
     }

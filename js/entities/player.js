@@ -201,7 +201,8 @@ class Player extends Ball {
     this.isCapping = 0;
     let targetControlPoints = map.getUnownedControlPoints(this.teamId);
     for (let i = 0; i < targetControlPoints.length; i++) {
-      if (targetControlPoints[i].pos.getDistance(this.pos) <= ControlPoint.CAPTURE_RADIUS) {
+      if (!targetControlPoints[i].contested
+        && targetControlPoints[i].pos.getDistance(this.pos) <= ControlPoint.CAPTURE_RADIUS) {
         this.score += Player.POINTS.inControlPointRadius;
         this.isCapping = 1;
         break;

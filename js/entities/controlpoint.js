@@ -19,6 +19,7 @@ class ControlPoint extends Ball {
     this.captureAmountPerTick = 0.034;
     this.captureTickTime = 6;
     this.captureLast = 0;
+    this.contested = false;
   };
   render(ctx, offset, scale) {
     ctx.save();
@@ -134,5 +135,6 @@ class ControlPoint extends Ball {
     this.blueCaptureAmount = 0;
     this.currentOwner = GameState.TEAM_ID.neutral;
     this.cappingTeam = GameState.TEAM_ID.neutral;
+    this.contested = false;
   };
 };
