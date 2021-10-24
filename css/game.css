@@ -1,0 +1,14 @@
+body {
+  background-color: #222;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  overflow: hidden;
+}
+canvas {
+  padding: 0;
+  margin: 0;
+  image-rendering: auto;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
