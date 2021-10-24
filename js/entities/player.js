@@ -23,9 +23,9 @@ class Player extends Ball {
     ,"controlPointTeam": 0.8
     ,"controlPointEnemy": 1
   };
-  static INFO_INPUT_COUNT = 3;// HP & isCapping + bias
+  static INFO_INPUT_COUNT = 5;// HP & isCapping + recurrence*2 + bias
   static MAX_INPUTS = (Player.VISION_RAYS.length * 2) + Player.INFO_INPUT_COUNT;
-  static MAX_OUTPUTS = 7;
+  static MAX_OUTPUTS = 9;
   static VIEW_DISTANCE = 12.0;
   static POINTS = {
     "damageEnemy": 10
@@ -66,13 +66,14 @@ class Player extends Ball {
 
     // Controls
     this.controlInputs = [];
-
+    this.recurrence = [0.0,0,0];
     this.visionInputs = [];
   };
-  reset() { // need gameTick to reset timers
+  reset() {
     this.pos = new Vector(this.home.x, this.home.y);
     this.vel = new Vector(0.0, 0.0);
     this.visionInputs = [];
+    this.recurrence = [0.0,0,0];
     this.controlInputs = [];
     this.direction = Math.random() * Math.PI * 2;
     this.hp = this.maxHP;
@@ -158,7 +159,7 @@ class Player extends Ball {
     this.controlInputs = controlInputs;
   };
   processControlInputs() {
-    /* [turnLeft, turnRight, moveForward, moveBackward, strafeLeft, strafeRight, attack] */
+    /* [turnLeft, turnRight, moveForward, moveBackward, strafeLeft, strafeRight, attack, recurrence1, recurrence2] */
 
     // Controls - Turning
     this.direction += this.turnSpeed * (this.controlInputs[0] - this.controlInputs[1]);
@@ -174,6 +175,8 @@ class Player extends Ball {
     );
     // Controls - Attack
     this.attack = Math.round(this.controlInputs[6]);
+    // Recurrence
+    this.recurrence = [this.controlInputs[7], this.controlInputs[8]];
     // Set Velocity
     this.vel = movement.normalize().rot(this.direction).mul(this.moveSpeed);
   };
@@ -286,7 +289,10 @@ class Player extends Ball {
     this.visionInputs[(Player.VISION_RAYS.length * 2)] = this.hp / this.maxHP;
     // Is Capping a Control Point, 19
     this.visionInputs[(Player.VISION_RAYS.length * 2) + 1] = this.isCapping;
+    // Recurrence
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 2] = this.recurrence[0];
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 3] = this.recurrence[1];
     // Bias of 1
-    this.visionInputs[(Player.VISION_RAYS.length * 2) + 2] = 1;
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 4] = 1;
   };
 };

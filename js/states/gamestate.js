@@ -312,6 +312,7 @@ class GameState extends State {
             this.blueTeam.neats[i].load(neatData.blueNeats[i]);
           }
         }
+        GameState.FILE_DATA = undefined;
       }
       this.initMenu();
       this.currentPhase = GameState.PHASES.play;
