@@ -43,8 +43,8 @@ class Player extends Ball {
     this.deadLast = -Infinity;
     this.maxHP = 100;
     this.hp = this.maxHP;
-    this.moveSpeed = 0.05;
-    this.turnSpeed = Math.PI / 8;
+    this.moveSpeed = 0.08;
+    this.turnSpeed = Math.PI / 12;
     this.direction = Math.random() * Math.PI * 2;
     this.home = new Vector(this.pos.x, this.pos.y);
 
