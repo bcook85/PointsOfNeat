@@ -28,45 +28,39 @@ class Neat {
     }
     return this.brains[brainId].feedForward_Combo(input);
   };
-  sortGeneration() {
-    let sorted = [];
-    for (let i = 0; i < this.brains.length; i++) {
-      let found = false;
-      for (let j = sorted.length - 1; j >= 0; j--) {
-        if (this.brains[i].score <= sorted[j].score) {
-          sorted.splice(j + 1, 0, this.brains[i]);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        sorted.unshift(this.brains[i]);
-      }
-    }
-    this.brains = sorted;
-  };
+  calculateFitness() {
+		let sum = 0;
+		for (let i = 0; i < this.brains.length; i++) {
+			sum += this.brains[i].score;
+		}
+		for (let i = 0; i < this.brains.length; i++) {
+			this.brains[i].fitness = this.brains[i].score / sum;
+		}
+	};
   nextGeneration() {
-    // this.brains.sort((a, b) => b.score - a.score);
-    this.sortGeneration();
+    this.calculateFitness();
     let newBrains = [];
     for (let i = 0; i < this.brains.length; i++) {
-      let first = this.pickTop(this.pickTop1);
-      let second = this.pickTop(this.pickTop2);
-      // while (second == first) {
-      //   second = this.pickTop(this.pickTop2);
-      // }
-      let newBrain = this.crossover(this.brains[first], this.brains[second]);
+      let newBrain = this.crossover(
+        this.brains[this.pickOne()]
+        ,this.brains[this.pickOne()]
+      );
       this.mutateBrain(newBrain);
       newBrains.push(newBrain);
     }
     this.brains = newBrains;
     this.generation += 1;
   };
-  pickTop(percent) {
-    return Math.floor(
-      Math.random() * Math.floor(this.populationSize * percent)
-    );
-  };
+  pickOne() {
+		let index = 0;
+		let r = Math.random();
+		while (r > 0) {
+      r = r - this.brains[index].fitness;
+      index += 1;
+		}
+		index -= 1;
+		return index;
+	};
   crossover(brain1, brain2) {
     let newBrain = new Brain(this.dimensions);
     for (let i = 0; i < newBrain.layers.length; i++) {

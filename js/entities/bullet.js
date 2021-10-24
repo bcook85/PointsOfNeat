@@ -14,7 +14,7 @@ class Bullet extends Ball {
 
     // Position
     this.direction = direction;
-    this.moveSpeed = 0.45;
+    this.moveSpeed = 0.6;
     this.vel = Vector.fromAngle(this.direction).normalize().mul(this.moveSpeed);
   };
   render(ctx, offset, scale) {

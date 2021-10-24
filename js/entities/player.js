@@ -30,7 +30,7 @@ class Player extends Ball {
   static POINTS = {
     "damageEnemy": 10
     ,"inControlPointRadius": 0.25
-    ,"shoot": -0.001
+    ,"alive": 0.0001
     ,"distance": 0.01
   };
 
@@ -131,7 +131,7 @@ class Player extends Ball {
     for (let i = 0; i < Player.VISION_RAYS.length; i++) {
       if (this.visionInputs[i * 2] != Player.VISION_TYPES.empty) {
         if (this.visionInputs[(i * 2)] == Player.VISION_TYPES.wall) {
-          ctx.strokeStyle = "rgb(255,255,255)";
+          ctx.strokeStyle = "rgb(128,128,128)";
         } else if (this.visionInputs[i * 2] == Player.VISION_TYPES.ally) {
           ctx.strokeStyle = "rgb(0,255,0)";
         } else if (this.visionInputs[i * 2] == Player.VISION_TYPES.enemy) {
