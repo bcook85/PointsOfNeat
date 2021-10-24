@@ -44,6 +44,16 @@ class Mouse {
         this.eDeltaY = e.deltaY;
       }, false
     );
+    canvasElement.addEventListener(
+      "touchstart", (e) => {
+        this.buttonLeft = true;
+      }, false
+    );
+    canvasElement.addEventListener(
+      "touchend", (e) => {
+        this.buttonLeft = false;
+      }, false
+    );
 	};
   render(ctx) {
     if (this.image != undefined) {
