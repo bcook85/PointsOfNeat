@@ -98,6 +98,7 @@ class StartState extends State {
       ,() => {
         let fileInput = document.createElement("input");
         fileInput.type = "file";
+        fileInput.accept = ".json";
         fileInput.onchange = () => {
           let fr = new FileReader();
           fr.readAsText(fileInput.files[0], "UTF-8");
