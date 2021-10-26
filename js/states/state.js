@@ -5,6 +5,10 @@ class State {
 		// Empty
 	}
 
+	init() {
+		// To Be Overriden
+	};
+
 	render(ctx) {
 		// To Be Overriden
 	};

@@ -2,29 +2,16 @@
 
 class EditorState extends State {
 
-  static PHASES = {
-    "load": 0
-    ,"play": 1
-  };
-
   static PLACEMENT_TYPES = {
     "spawnLocation": 0
     ,"controlPoint": 1
     ,"tile": 2
   };
 
-  constructor(screenSize, keyManager, mouse) {
+  constructor(keyManager, mouse) {
     super();
 
-    // Phase Control
-    this.currentPhase = EditorState.PHASES.load;
-
-    // Display
-    this.screenSize = screenSize;
-
     // Sprites
-    this.tileSprites = new SpriteSheetGrid("res/images/tiles.png", 32, 32);
-    this.editorSprites = new SpriteSheetCustom("res/images/editor.png");
     this.controlPointImages = [];
     this.redSpawnImage = undefined;
     this.blueSpawnImage = undefined;
@@ -45,67 +32,33 @@ class EditorState extends State {
     this.currentPlacementId = 0;
     this.collisionSelect = -1;
   };
-  render(ctx) {
-    switch (this.currentPhase) {
-      case EditorState.PHASES.load:
-        // Draw Loading Screen
-        ctx.font = "64px Monospace";
-        ctx.fillStyle = "rgb(255,0,0)";
-        ctx.textAlign = "center";
-        ctx.fillText(
-          "Loading..."
-          ,Math.floor(this.screenSize.x * 0.5)
-          ,Math.floor(this.screenSize.y * 0.5)
-        );
-        break;
-      case EditorState.PHASES.play:
-        // Map
-        this.drawMap(ctx, this.mapOffset, this.mapScale);
-        // Menu
-        this.menu.render(ctx, this.menuOffset);
-        break;
-      default:
-        break;
+  init() {
+    this.loadMap();
+    // Set Loaded Images
+    this.controlPointImages = [];
+    for (let i = 0; i < this.map.controlPointLocations.length; i++) {
+      this.controlPointImages.push(AssetManager.assets.cSpriteEditor.cutImage(536 + (i * 32), 48, 32, 32));
     }
+    this.redSpawnImage = AssetManager.assets.cSpriteEditor.cutImage(536, 80, 32, 32);
+    this.blueSpawnImage = AssetManager.assets.cSpriteEditor.cutImage(568, 80, 32, 32);
+    // Menu
+    this.initMenu();
+  };
+  render(ctx) {
+    // Map
+    this.drawMap(ctx, this.mapOffset, this.mapScale);
+    // Menu
+    this.menu.render(ctx, this.menuOffset);
   };
   update(elapsed) {
-    switch (this.currentPhase) {
-      case EditorState.PHASES.load:
-        if (this.assetsLoaded()) {
-          this.loadMap();
-          // Set Loaded Images
-          this.controlPointImages = [];
-          for (let i = 0; i < this.map.controlPointLocations.length; i++) {
-            this.controlPointImages.push(this.editorSprites.cutImage(536 + (i * 32), 48, 32, 32));
-          }
-          this.redSpawnImage = this.editorSprites.cutImage(536, 80, 32, 32);
-          this.blueSpawnImage = this.editorSprites.cutImage(568, 80, 32, 32);
-          // Menu
-          this.initMenu();
-          // All assets loaded, next phase
-          this.currentPhase = EditorState.PHASES.play;
-        }
-        break;
-      case EditorState.PHASES.play:
-        // Map Interaction
-        if (this.isMouseOnMap()) {
-          this.mapInteraction();
-        }
-        // Menu Interaction
-        if (this.isMouseOnMenu()) {
-          this.menuInteraction();
-        }
-        break;
-      default:
-        break;
+    // Map Interaction
+    if (this.isMouseOnMap()) {
+      this.mapInteraction();
     }
-  };
-  assetsLoaded() {
-    if (!this.tileSprites.loaded
-      || !this.editorSprites.loaded) {
-      return false;
+    // Menu Interaction
+    if (this.isMouseOnMenu()) {
+      this.menuInteraction();
     }
-    return true;
   };
   loadMap() {
     // Check localStorage for existing map data
@@ -121,15 +74,14 @@ class EditorState extends State {
     }
   };
   initMenu() {
-    this.menu = new Menu(this.editorSprites.cutImage(0, 0, 536, 672));
+    this.menu = new Menu(AssetManager.assets.cSpriteEditor.cutImage(0, 0, 536, 672));
 
     // Save ImageButton
     this.menu.imageButtons.push(new ImageButton(
-      this.editorSprites.cutImage(536, 0, 75, 24)
-      ,this.editorSprites.cutImage(611, 0, 75, 24)
+      AssetManager.assets.cSpriteEditor.cutImage(536, 0, 75, 24)
+      ,AssetManager.assets.cSpriteEditor.cutImage(611, 0, 75, 24)
       ,new Vector(437, 624)
       ,() => {
-        this.currentPhase = EditorState.PHASES.load;
         this.mouse.reset();
         this.saveMap();
         this.cancelEditor();
@@ -138,8 +90,8 @@ class EditorState extends State {
 
     // Reset ImageButton
     this.menu.imageButtons.push(new ImageButton(
-      this.editorSprites.cutImage(536, 24, 92, 24)
-      ,this.editorSprites.cutImage(628, 24, 92, 24)
+      AssetManager.assets.cSpriteEditor.cutImage(536, 24, 92, 24)
+      ,AssetManager.assets.cSpriteEditor.cutImage(628, 24, 92, 24)
       ,new Vector(24, 624)
       ,() => {
         this.mouse.reset();
@@ -154,7 +106,6 @@ class EditorState extends State {
       ,"rgb(0,255,0)"
       ,new Vector(220, 72)
       ,() => {
-        console.log("Spawn: Red");
         this.currentPlacementType = EditorState.PLACEMENT_TYPES.spawnLocation;
         this.currentPlacementId = "red";
       }
@@ -166,7 +117,6 @@ class EditorState extends State {
       ,"rgb(0,255,0)"
       ,new Vector(284, 72)
       ,() => {
-        console.log("Spawn: Blue");
         this.currentPlacementType = EditorState.PLACEMENT_TYPES.spawnLocation;
         this.currentPlacementId = "blue";
       }
@@ -179,7 +129,6 @@ class EditorState extends State {
         ,"rgb(0,255,0)"
         ,new Vector(124 + (i * 64), 168)
         ,() => {
-          console.log("ControlPoint: " + i);
           this.currentPlacementType = EditorState.PLACEMENT_TYPES.controlPoint;
           this.currentPlacementId = i;
         }
@@ -190,11 +139,10 @@ class EditorState extends State {
     for (let y = 0; y < 4; y++) {
       for (let x = 0; x < 4; x++) {
         this.menu.radioButtons.push(new RadioButton(
-          this.tileSprites.getImage((x + (y * 4)))
+          AssetManager.assets.gSpriteTiles.getImage((x + (y * 4)))
           ,"rgb(0,255,0)"
           ,new Vector(204 + (x * 32), 264 + (y *32))
           ,() => {
-            console.log("Tile: " + (x + (y * 4)));
             this.currentPlacementType = EditorState.PLACEMENT_TYPES.tile;
             this.currentPlacementId = (x + (y * 4));
           }
@@ -207,7 +155,7 @@ class EditorState extends State {
     this.menu.radioButtons[0].isSelected = true;
   };
   drawMap(ctx) {
-    this.map.renderEditor(ctx, this.tileSprites.images, this.mapOffset);
+    this.map.renderEditor(ctx, AssetManager.assets.gSpriteTiles.images, this.mapOffset);
     // Red Team Spawn
     ctx.drawImage(
       this.redSpawnImage
@@ -361,9 +309,9 @@ class EditorState extends State {
     StorageManager.setLocalStorage("map", mapData);
   };
   startGame() {
-    StateManager.setState("game");
+    StateManager.setState(StateManager.states.game);
   };
   cancelEditor() {
-    StateManager.setState("start");
+    StateManager.setState(StateManager.states.start);
   };
 };

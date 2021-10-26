@@ -3,9 +3,8 @@
 class GameState extends State {
 
   static PHASES = {
-    "load": 0
-    ,"play": 1
-    ,"reset": 2
+    "play": 0
+    ,"reset": 1
   };
 
   static TEAM_ID = {
@@ -18,7 +17,7 @@ class GameState extends State {
   static SPEED_UP = 10;
   static FILE_DATA = undefined;
 
-  constructor(screenSize, keyManager, mouse) {
+  constructor(keyManager, mouse) {
     super();
 
     // Timing
@@ -28,21 +27,12 @@ class GameState extends State {
     this.groupTick = 0;
     this.gameSpeed = 1;
 
-    // Display
-    this.screenSize = screenSize;
-
     // Input
     this.keys = keyManager;
     this.mouse = mouse;
 
     // Game Phase
-    this.currentPhase = GameState.PHASES.load;
-
-    // Sprites
-    this.entitySprites = new SpriteSheetGrid("res/images/entities.png", 32, 32);
-    this.tileSprites = new SpriteSheetGrid("res/images/tiles.png", 32, 32);
-    this.menuSprites = new SpriteSheetCustom("res/images/game.png");
-    this.font = new SpriteSheetGrid("res/images/font.png", 16, 16);
+    this.currentPhase = GameState.PHASES.reset;
 
     // Teams
     this.redTeam = undefined;
@@ -60,6 +50,13 @@ class GameState extends State {
     this.menu = undefined;
     this.menuOffset = new Vector(720, 24);
   };
+  init() {
+    this.initMap();
+    this.initTeams();
+    this.initMenu();
+    this.initNeats();
+    this.currentPhase = GameState.PHASES.play;
+  };
   initMap() {
     // Check localStorage for existing map data
     let mapData = StorageManager.getLocalStorage("map");
@@ -72,99 +69,98 @@ class GameState extends State {
       console.log("Map Data: default");
       this.map = new Map(DEFAULT_MAP);
     }
-    this.map.buildImage(this.tileSprites.images);
+    this.map.buildImage(AssetManager.assets.gSpriteTiles.images);
     this.map.initControlPoints(
-      this.entitySprites.getImage(2)
-      ,this.entitySprites.getImage(3)
-      ,this.entitySprites.getImage(4)
+      AssetManager.assets.gSpriteEntities.getImage(2)
+      ,AssetManager.assets.gSpriteEntities.getImage(3)
+      ,AssetManager.assets.gSpriteEntities.getImage(4)
     );
   };
   initMenu() {
-    this.menu = new Menu(this.menuSprites.cutImage(0, 0, 536, 672));
+    this.menu = new Menu(AssetManager.assets.cSpriteGame.cutImage(0, 0, 536, 672));
 
     // Generation
     this.menu.textItems.push(new DynamicText(
       new Vector(310, 67)
       ,new Vector(101, 16)
     ));
-    this.menu.textItems[0].update([this.generation], this.font);
+    this.menu.textItems[0].update([this.generation], AssetManager.assets.gSpriteFont);
     // Group
     this.menu.textItems.push(new DynamicText(
       new Vector(185, 115)
       ,new Vector(67, 16)
     ));
-    this.menu.textItems[1].update([this.neatGroup + 1], this.font);
+    this.menu.textItems[1].update([this.neatGroup + 1], AssetManager.assets.gSpriteFont);
     // Time
     this.menu.textItems.push(new DynamicText(
       new Vector(367, 115)
       ,new Vector(67, 16)
     ));
-    this.menu.textItems[2].update(this.calculateTimeRemaining(), this.font);
+    this.menu.textItems[2].update(this.calculateTimeRemaining(), AssetManager.assets.gSpriteFont);
     // Red 1
     this.menu.textItems.push(new DynamicText(
       new Vector(125, 211)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[3].update("0", this.font);
+    this.menu.textItems[3].update("0", AssetManager.assets.gSpriteFont);
     // Red 2
     this.menu.textItems.push(new DynamicText(
       new Vector(125, 251)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[4].update("0", this.font);
+    this.menu.textItems[4].update("0", AssetManager.assets.gSpriteFont);
     // Red 3
     this.menu.textItems.push(new DynamicText(
       new Vector(125, 291)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[5].update("0", this.font);
+    this.menu.textItems[5].update("0", AssetManager.assets.gSpriteFont);
     // Red 4
     this.menu.textItems.push(new DynamicText(
       new Vector(125, 331)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[6].update("0", this.font);
+    this.menu.textItems[6].update("0", AssetManager.assets.gSpriteFont);
     // Red 5
     this.menu.textItems.push(new DynamicText(
       new Vector(125, 371)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[7].update("0", this.font);
+    this.menu.textItems[7].update("0", AssetManager.assets.gSpriteFont);
     // Blue 1
     this.menu.textItems.push(new DynamicText(
       new Vector(325, 211)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[8].update("0", this.font);
+    this.menu.textItems[8].update("0", AssetManager.assets.gSpriteFont);
     // Blue 2
     this.menu.textItems.push(new DynamicText(
       new Vector(325, 251)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[9].update("0", this.font);
+    this.menu.textItems[9].update("0", AssetManager.assets.gSpriteFont);
     // Blue 3
     this.menu.textItems.push(new DynamicText(
       new Vector(325, 291)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[10].update("0", this.font);
+    this.menu.textItems[10].update("0", AssetManager.assets.gSpriteFont);
     // Blue 4
     this.menu.textItems.push(new DynamicText(
       new Vector(325, 331)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[11].update("0", this.font);
+    this.menu.textItems[11].update("0", AssetManager.assets.gSpriteFont);
     // Blue 5
     this.menu.textItems.push(new DynamicText(
       new Vector(325, 371)
       ,new Vector(84, 16)
     ));
-    this.menu.textItems[12].update("0", this.font);
-
+    this.menu.textItems[12].update("0", AssetManager.assets.gSpriteFont);
 
     // Speed Button
     this.menu.toggleButtons.push(new ToggleButton(
-      this.menuSprites.cutImage(0, 672, 38, 24)
+      AssetManager.assets.cSpriteGame.cutImage(0, 672, 38, 24)
       ,"rgb(0,255,0)"
       ,new Vector(192, 624)
       ,() => {
@@ -177,7 +173,7 @@ class GameState extends State {
     ));
     // Vision Button
     this.menu.toggleButtons.push(new ToggleButton(
-      this.menuSprites.cutImage(76, 672, 38, 24)
+      AssetManager.assets.cSpriteGame.cutImage(76, 672, 38, 24)
       ,"rgb(0,255,0)"
       ,new Vector(254, 624)
       ,() => {
@@ -187,8 +183,8 @@ class GameState extends State {
     ));
     // Save Button
     this.menu.imageButtons.push(new ImageButton(
-      this.menuSprites.cutImage(152, 672, 38, 24)
-      ,this.menuSprites.cutImage(190, 672, 38, 24)
+      AssetManager.assets.cSpriteGame.cutImage(152, 672, 38, 24)
+      ,AssetManager.assets.cSpriteGame.cutImage(190, 672, 38, 24)
       ,new Vector(316, 624)
       ,() => {
         this.saveNeats();
@@ -199,56 +195,57 @@ class GameState extends State {
     this.redTeam = new Team(
       GameState.TEAM_ID.red
       ,new Vector(this.map.redSpawn.x, this.map.redSpawn.y)
-      ,this.entitySprites.getImage(0)
-      ,this.entitySprites.getImage(5)
+      ,AssetManager.assets.gSpriteEntities.getImage(0)
+      ,AssetManager.assets.gSpriteEntities.getImage(5)
     );
     this.blueTeam = new Team(
       GameState.TEAM_ID.blue
       ,new Vector(this.map.blueSpawn.x, this.map.blueSpawn.y)
-      ,this.entitySprites.getImage(1)
-      ,this.entitySprites.getImage(6)
+      ,AssetManager.assets.gSpriteEntities.getImage(1)
+      ,AssetManager.assets.gSpriteEntities.getImage(6)
     );
     this.redTeam.initPlayers();
     this.blueTeam.initPlayers();
   };
   initNeats() {
-    // Initialize Neats
     this.redTeam.initNeats();
     this.blueTeam.initNeats();
-    // If this.neatFile is set, load from that file
+    if (GameState.FILE_DATA != undefined) {
+      let neatData = JSON.parse(GameState.FILE_DATA);
+      if (neatData.generation) {
+        this.generation = parseInt(neatData.generation);
+        this.menu.textItems[0].update([this.generation], AssetManager.assets.gSpriteFont);
+        for (let i = 0; i < Team.MAX_PLAYERS; i++) {
+          this.redTeam.neats[i].load(neatData.redNeats[i]);
+          this.blueTeam.neats[i].load(neatData.blueNeats[i]);
+        }
+      }
+      GameState.FILE_DATA = undefined;
+    }
   };
   render(ctx) {
     switch(this.currentPhase) {
-      case GameState.PHASES.load:
-        this.renderLoad(ctx);
-        break;
       case GameState.PHASES.play:
         this.renderPlay(ctx);
         break;
       case GameState.PHASES.reset:
-        this.renderReset(ctx);
+        ctx.font = "96px Monospace";
+        ctx.fillStyle = "rgb(255,0,0)";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "Resetting..."
+          ,Math.floor(AssetManager.screenSize.x * 0.5)
+          ,Math.floor(AssetManager.screenSize.y * 0.5)
+        );
         break;
     }
     this.renderFps(ctx);
-  };
-  renderMessageScreen(ctx, message) {
-    ctx.font = "64px Monospace";
-    ctx.fillStyle = "rgb(255,0,0)";
-    ctx.textAlign = "center";
-    ctx.fillText(
-      message
-      ,Math.floor(this.screenSize.x * 0.5)
-      ,Math.floor(this.screenSize.y * 0.5)
-    );
   };
   renderFps(ctx) {
     ctx.font = "18px Monospace";
     ctx.fillStyle = "rgb(0,255,0)";
     ctx.textAlign = "right";
-    ctx.fillText(this.fps, this.screenSize.x, this.screenSize.y - 2);
-  };
-  renderLoad(ctx) {
-    this.renderMessageScreen(ctx, "Loading...");
+    ctx.fillText(this.fps, AssetManager.screenSize.x, AssetManager.screenSize.y - 2);
   };
   renderPlay(ctx) {
     this.map.render(ctx, this.mapOffset);
@@ -261,21 +258,15 @@ class GameState extends State {
     // Control Points
     this.map.renderControlPoints(ctx, this.mapOffset);
     // Time Remaining
-    this.menu.textItems[2].update(this.calculateTimeRemaining(), this.font);
+    this.menu.textItems[2].update(this.calculateTimeRemaining(), AssetManager.assets.gSpriteFont);
     // Player Scores
     this.updatePlayerScores();
     // Menu
     this.menu.render(ctx, this.menuOffset);
   };
-  renderReset(ctx) {
-    this.renderMessageScreen(ctx, "Resetting...");
-  };
   update(elapsed) {
     this.timing(elapsed);
     switch(this.currentPhase) {
-      case GameState.PHASES.load:
-        this.updateLoad();
-        break;
       case GameState.PHASES.play:
         this.updatePlay();
         break;
@@ -284,39 +275,10 @@ class GameState extends State {
         break;
     }
   };
-  assetsLoaded() {
-    if (!this.entitySprites.loaded) {
-      return false;
-    }
-    if (!this.tileSprites.loaded) {
-      return false;
-    }
-    return true;
-  };
   timing(elapsed) {
     this.gameElapsed = elapsed;
     this.fps = Math.round(1000 / this.gameElapsed);
     this.gameTick++;
-  };
-  updateLoad() {
-    if (this.assetsLoaded()) {
-      this.initMap();
-      this.initTeams();
-      this.initNeats();
-      if (GameState.FILE_DATA != undefined) {
-        let neatData = JSON.parse(GameState.FILE_DATA);
-        if (neatData.generation) {
-          this.generation = parseInt(neatData.generation);
-          for (let i = 0; i < Team.MAX_PLAYERS; i++) {
-            this.redTeam.neats[i].load(neatData.redNeats[i]);
-            this.blueTeam.neats[i].load(neatData.blueNeats[i]);
-          }
-        }
-        GameState.FILE_DATA = undefined;
-      }
-      this.initMenu();
-      this.currentPhase = GameState.PHASES.play;
-    }
   };
   updatePlay() {
     for (let i = 0; i < this.gameSpeed; i++) {
@@ -345,9 +307,9 @@ class GameState extends State {
       this.redTeam.nextGeneration();
       this.blueTeam.nextGeneration();
       this.generation += 1;
-      this.menu.textItems[0].update([this.generation], this.font);
+      this.menu.textItems[0].update([this.generation], AssetManager.assets.gSpriteFont);
     }
-    this.menu.textItems[1].update([this.neatGroup + 1], this.font);
+    this.menu.textItems[1].update([this.neatGroup + 1], AssetManager.assets.gSpriteFont);
     // Set Neat Group for next group
     this.redTeam.setNeatGroup(this.neatGroup);
     this.blueTeam.setNeatGroup(this.neatGroup);
@@ -386,16 +348,16 @@ class GameState extends State {
     }
   };
   updatePlayerScores() {
-    this.menu.textItems[3].update(Math.floor(this.redTeam.players[0].score), this.font);// Red 1
-    this.menu.textItems[4].update(Math.floor(this.redTeam.players[1].score), this.font);// Red 2
-    this.menu.textItems[5].update(Math.floor(this.redTeam.players[2].score), this.font);// Red 3
-    this.menu.textItems[6].update(Math.floor(this.redTeam.players[3].score), this.font);// Red 4
-    this.menu.textItems[7].update(Math.floor(this.redTeam.players[4].score), this.font);// Red 5
-    this.menu.textItems[8].update(Math.floor(this.blueTeam.players[0].score), this.font);// Blue 1
-    this.menu.textItems[9].update(Math.floor(this.blueTeam.players[1].score), this.font);// Blue 2
-    this.menu.textItems[10].update(Math.floor(this.blueTeam.players[2].score), this.font);// Blue 3
-    this.menu.textItems[11].update(Math.floor(this.blueTeam.players[3].score), this.font);// Blue 4
-    this.menu.textItems[12].update(Math.floor(this.blueTeam.players[4].score), this.font);// Blue 5
+    this.menu.textItems[3].update(Math.floor(this.redTeam.players[0].score), AssetManager.assets.gSpriteFont);// Red 1
+    this.menu.textItems[4].update(Math.floor(this.redTeam.players[1].score), AssetManager.assets.gSpriteFont);// Red 2
+    this.menu.textItems[5].update(Math.floor(this.redTeam.players[2].score), AssetManager.assets.gSpriteFont);// Red 3
+    this.menu.textItems[6].update(Math.floor(this.redTeam.players[3].score), AssetManager.assets.gSpriteFont);// Red 4
+    this.menu.textItems[7].update(Math.floor(this.redTeam.players[4].score), AssetManager.assets.gSpriteFont);// Red 5
+    this.menu.textItems[8].update(Math.floor(this.blueTeam.players[0].score), AssetManager.assets.gSpriteFont);// Blue 1
+    this.menu.textItems[9].update(Math.floor(this.blueTeam.players[1].score), AssetManager.assets.gSpriteFont);// Blue 2
+    this.menu.textItems[10].update(Math.floor(this.blueTeam.players[2].score), AssetManager.assets.gSpriteFont);// Blue 3
+    this.menu.textItems[11].update(Math.floor(this.blueTeam.players[3].score), AssetManager.assets.gSpriteFont);// Blue 4
+    this.menu.textItems[12].update(Math.floor(this.blueTeam.players[4].score), AssetManager.assets.gSpriteFont);// Blue 5
   };
   calculateRays_180(count) {
     let rays = [];

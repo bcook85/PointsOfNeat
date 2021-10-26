@@ -1,14 +1,30 @@
 'use strict';
 
 class StateManager {
+
 	static currentState = undefined;
-    static states = {};
-    static addState(state, name) {
-        StateManager.states[name] = state;
+  static states = {};
+  static initialState = undefined;
+
+  static init(keys, mouse) {
+    // Define States
+    StateManager.states = {
+      "start": new StartState(keys, mouse)
+      ,"editor": new EditorState(keys, mouse)
+      ,"game": new GameState(keys, mouse)
     };
-	static setState(name) {
-		StateManager.currentState = StateManager.states[name];
+    StateManager.initialState = StateManager.states.start;
+  };
+
+  static setInitialState() {
+    StateManager.setState(StateManager.initialState);
+  };
+
+	static setState(state) {
+		StateManager.currentState = state;
+    StateManager.currentState.init();
 	};
+
 	static getState() {
 		return StateManager.currentState;
 	};

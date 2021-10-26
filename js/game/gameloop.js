@@ -2,8 +2,6 @@
 
 class GameLoop {
 
-  static FRAMES_PER_SECOND = 60.0;
-
   constructor(canvasElement, fullScreen) {
     // Loop Timing
     this.animationFrameId = 0;
@@ -15,23 +13,14 @@ class GameLoop {
     // Input
     this.keyManager = new KeyManager();
     this.mouse = new Mouse(canvasElement);
+    // Assets
+    AssetManager.init(this.screen.getSize());
     // States
-		this.startState = new StartState(this.screen.getSize(), this.keyManager, this.mouse);
-		this.editorState = new EditorState(this.screen.getSize(), this.keyManager, this.mouse);
-		this.gameState = new GameState(this.screen.getSize(), this.keyManager, this.mouse);
+    StateManager.init(this.keyManager, this.mouse);
   };
   start() {
-    // Initialize Loop Variables
-    this.now = performance.now();
-    this.elapsed = 0;
-    this.last = this.now;
-    // State Manager
-    StateManager.addState(this.startState, "start");
-    StateManager.addState(this.editorState, "edit");
-    StateManager.addState(this.gameState, "game");
-    StateManager.setState("start");
-    // Begin Loop
-    this.animationFrameId = window.requestAnimationFrame( () => this.loop() );
+    // Begin Load
+    this.animationFrameId = window.requestAnimationFrame( () => this.load() );
   };
   stop() {
     window.cancelAnimationFrame(this.animationFrameId);
@@ -40,6 +29,30 @@ class GameLoop {
     this.now = performance.now();
     this.elapsed = this.now - this.last;
     this.last = this.now;
+  };
+  load() {
+    if (AssetManager.isReady()) {
+      // Start State
+      StateManager.setInitialState();
+      // Initialize Loop Variables
+      this.now = performance.now();
+      this.elapsed = 0;
+      this.last = this.now;
+      // Begin Loop
+      this.animationFrameId = window.requestAnimationFrame( () => this.loop() );
+    } else {
+      // Continue Load
+      this.animationFrameId = window.requestAnimationFrame( () => this.load() );
+      // Display Loading Message
+      this.screen.ctx.font = "96px Monospace";
+      this.screen.ctx.fillStyle = "rgb(255,0,0)";
+      this.screen.ctx.textAlign = "center";
+      this.screen.ctx.fillText(
+        "Loading..."
+        ,Math.floor(this.screen.canvas.width * 0.5)
+        ,Math.floor(this.screen.canvas.height * 0.5)
+      );
+    }
   };
   loop() {
     // Request Next Frame
