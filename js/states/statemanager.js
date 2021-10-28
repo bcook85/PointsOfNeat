@@ -4,20 +4,17 @@ class StateManager {
 
 	static currentState = undefined;
   static states = {};
-  static initialState = undefined;
 
   static init(keys, mouse) {
     // Define States
     StateManager.states = {
-      "start": new StartState(keys, mouse)
+      "load": new LoadState(keys, mouse)
+      ,"start": new StartState(keys, mouse)
       ,"editor": new EditorState(keys, mouse)
       ,"game": new GameState(keys, mouse)
     };
-    StateManager.initialState = StateManager.states.start;
-  };
-
-  static setInitialState() {
-    StateManager.setState(StateManager.initialState);
+    // Set Initial State
+    StateManager.setState(StateManager.states.load);
   };
 
 	static setState(state) {

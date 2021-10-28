@@ -1,8 +1,10 @@
 'use strict';
 
 class State {
-	constructor() {
-		// Empty
+	constructor(keyManager, mouse) {
+		// Input
+		this.keys = keyManager;
+		this.mouse = mouse;
 	}
 
 	init() {

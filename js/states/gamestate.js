@@ -14,22 +14,18 @@ class GameState extends State {
   };
 
   static MAX_GROUP_TICK = 60 * 30;// 60 frames per second * N = N Seconds
-  static SPEED_UP = 10;
   static FILE_DATA = undefined;
 
   constructor(keyManager, mouse) {
-    super();
+    super(keyManager, mouse);
 
     // Timing
     this.gameTick = 0;
     this.gameElapsed = 0;
     this.fps = 0;
     this.groupTick = 0;
-    this.gameSpeed = 1;
-
-    // Input
-    this.keys = keyManager;
-    this.mouse = mouse;
+    this.fast = false;
+    this.fastDuration = 10;// Millisecond duration of fast update
 
     // Game Phase
     this.currentPhase = GameState.PHASES.reset;
@@ -164,11 +160,7 @@ class GameState extends State {
       ,"rgb(0,255,0)"
       ,new Vector(192, 624)
       ,() => {
-        if (this.gameSpeed == GameState.SPEED_UP) {
-          this.gameSpeed = 1;
-        } else {
-          this.gameSpeed = GameState.SPEED_UP;
-        }
+        this.fast = !this.fast;
       }
     ));
     // Vision Button
@@ -208,19 +200,22 @@ class GameState extends State {
     this.blueTeam.initPlayers();
   };
   initNeats() {
+    // Initialize as new
     this.redTeam.initNeats();
     this.blueTeam.initNeats();
+    // If Load Sim, load data
     if (GameState.FILE_DATA != undefined) {
       let neatData = JSON.parse(GameState.FILE_DATA);
-      if (neatData.generation) {
-        this.generation = parseInt(neatData.generation);
-        this.menu.textItems[0].update([this.generation], AssetManager.assets.gSpriteFont);
-        for (let i = 0; i < Team.MAX_PLAYERS; i++) {
-          this.redTeam.neats[i].load(neatData.redNeats[i]);
-          this.blueTeam.neats[i].load(neatData.blueNeats[i]);
-        }
+      this.generation = parseInt(neatData.generation);
+      this.menu.textItems[0].update([this.generation], AssetManager.assets.gSpriteFont);
+      for (let i = 0; i < Team.MAX_PLAYERS; i++) {
+        this.redTeam.neats[i].load(neatData.redNeats[i]);
+        this.blueTeam.neats[i].load(neatData.blueNeats[i]);
       }
       GameState.FILE_DATA = undefined;
+      console.log("NEAT Data: File");
+    } else {
+      console.log("NEAT Data: New");
     }
   };
   render(ctx) {
@@ -281,14 +276,25 @@ class GameState extends State {
     this.gameTick++;
   };
   updatePlay() {
-    for (let i = 0; i < this.gameSpeed; i++) {
+    if (this.fast) {
+      let stopTime = performance.now() + this.fastDuration;
+      while (performance.now() < stopTime) {
+        this.redTeam.update(this.groupTick, this.blueTeam.getLivingPlayers(), this.map);
+        this.blueTeam.update(this.groupTick, this.redTeam.getLivingPlayers(), this.map);
+        this.map.update(this.groupTick, this.redTeam.getLivingPlayers(), this.blueTeam.getLivingPlayers());
+        this.groupTick += 1;
+        if (this.groupTick >= GameState.MAX_GROUP_TICK) {
+          this.currentPhase = GameState.PHASES.reset;
+          break;
+        }
+      }
+    } else {
       this.redTeam.update(this.groupTick, this.blueTeam.getLivingPlayers(), this.map);
       this.blueTeam.update(this.groupTick, this.redTeam.getLivingPlayers(), this.map);
       this.map.update(this.groupTick, this.redTeam.getLivingPlayers(), this.blueTeam.getLivingPlayers());
       this.groupTick += 1;
       if (this.groupTick >= GameState.MAX_GROUP_TICK) {
         this.currentPhase = GameState.PHASES.reset;
-        break;
       }
     }
     this.menu.update(this.mouse.pos.sub(this.menuOffset), this.mouse.buttonLeft);

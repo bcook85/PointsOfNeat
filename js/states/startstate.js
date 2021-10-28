@@ -2,17 +2,8 @@
 
 class StartState extends State {
 
-  static PHASES = {
-    "load": 0
-    ,"play": 1
-  };
-
   constructor(keyManager, mouse) {
-    super();
-
-    // Input
-    this.keys = keyManager;
-    this.mouse = mouse;
+    super(keyManager, mouse);
 
     // Menu
     this.menuOffset = new Vector(24, 24);

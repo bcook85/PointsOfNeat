@@ -9,17 +9,12 @@ class EditorState extends State {
   };
 
   constructor(keyManager, mouse) {
-    super();
+    super(keyManager, mouse);
 
     // Sprites
     this.controlPointImages = [];
     this.redSpawnImage = undefined;
     this.blueSpawnImage = undefined;
-
-    // Input
-    this.keys = keyManager;
-    this.mouse = mouse;
-    this.hoveredTile = new Vector(0, 0);
 
     // Map
     this.map = undefined;
@@ -28,6 +23,7 @@ class EditorState extends State {
     // Menu
     this.menuOffset = new Vector(720, 24);
     this.menu = undefined;
+    this.hoveredTile = new Vector(0, 0);
     this.currentPlacementType = EditorState.PLACEMENT_TYPES.tile;
     this.currentPlacementId = 0;
     this.collisionSelect = -1;

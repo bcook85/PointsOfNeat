@@ -46,11 +46,23 @@ class Mouse {
     );
     canvasElement.addEventListener(
       "touchstart", (e) => {
+        e.preventDefault();
         this.buttonLeft = true;
+        let canvasRect = canvasElement.getBoundingClientRect();
+        let scaleX = canvasElement.width / canvasRect.width;
+        let scaleY = canvasElement.height / canvasRect.height;
+        this.pos.x = Math.min(Math.max(Math.floor((e.touches[0].clientX - canvasRect.left) * scaleX), 0), canvasElement.width);
+        this.pos.y = Math.min(Math.max(Math.floor((e.touches[0].clientY - canvasRect.top) * scaleY), 0), canvasElement.height);
+      }, false
+    );
+    canvasElement.addEventListener(
+      "touchmove", (e) => {
+        e.preventDefault();
       }, false
     );
     canvasElement.addEventListener(
       "touchend", (e) => {
+        e.preventDefault();
         this.buttonLeft = false;
       }, false
     );
