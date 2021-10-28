@@ -2,8 +2,8 @@
 
 class LoadState extends State {
 
-  constructor(keyManager, mouse) {
-    super(keyManager, mouse);
+  constructor(screenSize, keyManager, mouse) {
+    super(screenSize, keyManager, mouse);
   };
   init() {
     // N/A
@@ -15,8 +15,8 @@ class LoadState extends State {
     ctx.textAlign = "center";
     ctx.fillText(
       "Loading..."
-      ,Math.floor(AssetManager.screenSize.x * 0.5)
-      ,Math.floor(AssetManager.screenSize.y * 0.5)
+      ,Math.floor(this.screenSize.x * 0.5)
+      ,Math.floor(this.screenSize.y * 0.5)
     );
   };
   update() {

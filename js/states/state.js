@@ -1,7 +1,9 @@
 'use strict';
 
 class State {
-	constructor(keyManager, mouse) {
+	constructor(screenSize, keyManager, mouse) {
+		// Screen Size
+		this.screenSize = new Vector(screenSize.x, screenSize.y);
 		// Input
 		this.keys = keyManager;
 		this.mouse = mouse;

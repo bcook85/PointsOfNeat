@@ -13,10 +13,8 @@ class GameLoop {
     // Input
     this.keyManager = new KeyManager();
     this.mouse = new Mouse(canvasElement);
-    // Assets
-    AssetManager.init(this.screen.getSize());
     // States
-    StateManager.init(this.keyManager, this.mouse);
+    StateManager.init(this.screen.getSize(), this.keyManager, this.mouse);
   };
   start() {
     // Initialize Loop Variables

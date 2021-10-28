@@ -8,8 +8,8 @@ class EditorState extends State {
     ,"tile": 2
   };
 
-  constructor(keyManager, mouse) {
-    super(keyManager, mouse);
+  constructor(screenSize, keyManager, mouse) {
+    super(screenSize, keyManager, mouse);
 
     // Sprites
     this.controlPointImages = [];
@@ -33,10 +33,10 @@ class EditorState extends State {
     // Set Loaded Images
     this.controlPointImages = [];
     for (let i = 0; i < this.map.controlPointLocations.length; i++) {
-      this.controlPointImages.push(AssetManager.assets.cSpriteEditor.cutImage(536 + (i * 32), 48, 32, 32));
+      this.controlPointImages.push(AssetManager.cSpriteEditor.cutImage(536 + (i * 32), 48, 32, 32));
     }
-    this.redSpawnImage = AssetManager.assets.cSpriteEditor.cutImage(536, 80, 32, 32);
-    this.blueSpawnImage = AssetManager.assets.cSpriteEditor.cutImage(568, 80, 32, 32);
+    this.redSpawnImage = AssetManager.cSpriteEditor.cutImage(536, 80, 32, 32);
+    this.blueSpawnImage = AssetManager.cSpriteEditor.cutImage(568, 80, 32, 32);
     // Menu
     this.initMenu();
   };
@@ -70,12 +70,12 @@ class EditorState extends State {
     }
   };
   initMenu() {
-    this.menu = new Menu(AssetManager.assets.cSpriteEditor.cutImage(0, 0, 536, 672));
+    this.menu = new Menu(AssetManager.cSpriteEditor.cutImage(0, 0, 536, 672));
 
     // Save ImageButton
     this.menu.imageButtons.push(new ImageButton(
-      AssetManager.assets.cSpriteEditor.cutImage(536, 0, 75, 24)
-      ,AssetManager.assets.cSpriteEditor.cutImage(611, 0, 75, 24)
+      AssetManager.cSpriteEditor.cutImage(536, 0, 75, 24)
+      ,AssetManager.cSpriteEditor.cutImage(611, 0, 75, 24)
       ,new Vector(437, 624)
       ,() => {
         this.mouse.reset();
@@ -86,8 +86,8 @@ class EditorState extends State {
 
     // Reset ImageButton
     this.menu.imageButtons.push(new ImageButton(
-      AssetManager.assets.cSpriteEditor.cutImage(536, 24, 92, 24)
-      ,AssetManager.assets.cSpriteEditor.cutImage(628, 24, 92, 24)
+      AssetManager.cSpriteEditor.cutImage(536, 24, 92, 24)
+      ,AssetManager.cSpriteEditor.cutImage(628, 24, 92, 24)
       ,new Vector(24, 624)
       ,() => {
         this.mouse.reset();
@@ -135,7 +135,7 @@ class EditorState extends State {
     for (let y = 0; y < 4; y++) {
       for (let x = 0; x < 4; x++) {
         this.menu.radioButtons.push(new RadioButton(
-          AssetManager.assets.gSpriteTiles.getImage((x + (y * 4)))
+          AssetManager.gSpriteTiles.getImage((x + (y * 4)))
           ,"rgb(0,255,0)"
           ,new Vector(204 + (x * 32), 264 + (y *32))
           ,() => {
@@ -151,7 +151,7 @@ class EditorState extends State {
     this.menu.radioButtons[0].isSelected = true;
   };
   drawMap(ctx) {
-    this.map.renderEditor(ctx, AssetManager.assets.gSpriteTiles.images, this.mapOffset);
+    this.map.renderEditor(ctx, AssetManager.gSpriteTiles.images, this.mapOffset);
     // Red Team Spawn
     ctx.drawImage(
       this.redSpawnImage
