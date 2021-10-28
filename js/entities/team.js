@@ -94,8 +94,9 @@ class Team {
         // Neural Network
         this.players[i].score += Player.POINTS.alive;
         this.players[i].processVision(this.players, enemies, map);
-        let outputs = this.neats[i].processInput(this.neatGroup, this.players[i].visionInputs);
-        this.players[i].setControlInputs(outputs);
+        this.players[i].processControlInputs(
+          this.neats[i].processInput(this.neatGroup, this.players[i].visionInputs)
+        );
         // Update Player
         this.players[i].update(
           gameTick

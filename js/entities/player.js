@@ -65,17 +65,17 @@ class Player extends Ball {
     this.maxDistance = 0;
 
     // Controls
-    this.controlInputs = [];
-    this.recurrence = [0.0,0,0];
-    this.visionInputs = [];
+    this.controlInputs = new Array(Player.MAX_OUTPUTS).fill(0.0);
+    this.recurrence = new Array(2).fill(0.0);
+    this.visionInputs = new Array(Player.MAX_INPUTS).fill(0.0);
   };
   reset() {
     this.pos = new Vector(this.home.x, this.home.y);
     this.vel = new Vector(0.0, 0.0);
-    this.visionInputs = [];
-    this.recurrence = [0.0,0,0];
-    this.controlInputs = [];
     this.direction = Math.random() * Math.PI * 2;
+    // Controls
+    this.recurrence = new Array(2).fill(0.0);
+    // Stats
     this.hp = this.maxHP;
     this.alive = true;
     this.score = 0;
@@ -87,6 +87,7 @@ class Player extends Ball {
     this.pos = new Vector(this.home.x, this.home.y);
     this.vel = new Vector(0.0, 0.0);
     this.direction = Math.random() * Math.PI * 2;
+    // Stats
     this.hp = this.maxHP;
     this.alive = true;
     this.attackLast = -Infinity;
@@ -153,8 +154,6 @@ class Player extends Ball {
     }
   };
   update(gameTick, allies, enemies, map) {
-    this.processVision(allies, enemies, map);
-    this.processControlInputs();
     this.move(map, enemies);
     // Distance From Home
     let currentDistance = this.home.sub(this.pos).mag2();
@@ -164,10 +163,8 @@ class Player extends Ball {
     }
     this.controlPointInteraction(map);
   };
-  setControlInputs(controlInputs) {
+  processControlInputs(controlInputs) {
     this.controlInputs = controlInputs;
-  };
-  processControlInputs() {
     /* [turnLeft, turnRight, moveForward, moveBackward, strafeLeft, strafeRight, attack, recurrence1, recurrence2] */
 
     // Controls - Turning
@@ -232,8 +229,6 @@ class Player extends Ball {
     }
   };
   processVision(allies, enemies, map) {
-    this.visionInputs = new Array(Player.MAX_INPUTS).fill(0);
-
     // Vision Inputs
     for (let r = 0; r < Player.VISION_RAYS.length; r++) {
       let playerDir = this.direction + Player.VISION_RAYS[r];
