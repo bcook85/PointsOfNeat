@@ -66,13 +66,15 @@ class Neat {
     for (let i = 0; i < newBrain.layers.length; i++) {
       for (let j = 0; j < newBrain.layers[i].neurons.length; j++) {
         for (let k = 0; k < newBrain.layers[i].neurons[j].weights.length; k++) {
-          newBrain.layers[i].neurons[j].weights[k] = brain1.layers[i].neurons[j].weights[k];
           if (Math.random() <= 0.5) {
+            newBrain.layers[i].neurons[j].weights[k] = brain1.layers[i].neurons[j].weights[k];
+          } else {
             newBrain.layers[i].neurons[j].weights[k] = brain2.layers[i].neurons[j].weights[k];
           }
         }
-        newBrain.layers[i].neurons[j].bias = brain1.layers[i].neurons[j].bias;
         if (Math.random() <= 0.5) {
+          newBrain.layers[i].neurons[j].bias = brain1.layers[i].neurons[j].bias;
+        } else {
           newBrain.layers[i].neurons[j].bias = brain2.layers[i].neurons[j].bias;
         }
       }

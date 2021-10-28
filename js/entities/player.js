@@ -191,8 +191,14 @@ class Player extends Ball {
   };
   move(map, enemies) {
     // Collision to adjust velocity
-    Ball.vsBalls(this, map.controlPoints);
-    Ball.vsBalls(this, enemies);
+    for (let i = 0; i < map.controlPoints.length; i++) {
+      Ball.resolveBallCollision(this, map.controlPoints[i]);
+    }
+    for (let i = 0; i < enemies.length; i++) {
+      if (enemies[i].alive) {
+        Ball.resolveBallCollision(this, enemies[i]);
+      }
+    }
     Ball.resolveGridCollisions(this, map.grid);
     // Update Position
     this.pos = this.pos.add(this.vel);

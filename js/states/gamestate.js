@@ -25,7 +25,7 @@ class GameState extends State {
     this.fps = 0;
     this.groupTick = 0;
     this.fast = false;
-    this.fastDuration = 10;// Millisecond duration of fast update
+    this.fastDuration = 8;// Millisecond duration of fast update
 
     // Game Phase
     this.currentPhase = GameState.PHASES.reset;
@@ -279,9 +279,9 @@ class GameState extends State {
     if (this.fast) {
       let stopTime = performance.now() + this.fastDuration;
       while (performance.now() < stopTime) {
-        this.redTeam.update(this.groupTick, this.blueTeam.getLivingPlayers(), this.map);
-        this.blueTeam.update(this.groupTick, this.redTeam.getLivingPlayers(), this.map);
-        this.map.update(this.groupTick, this.redTeam.getLivingPlayers(), this.blueTeam.getLivingPlayers());
+        this.redTeam.update(this.groupTick, this.blueTeam.players, this.map);
+        this.blueTeam.update(this.groupTick, this.redTeam.players, this.map);
+        this.map.update(this.groupTick, this.redTeam.players, this.blueTeam.players);
         this.groupTick += 1;
         if (this.groupTick >= GameState.MAX_GROUP_TICK) {
           this.currentPhase = GameState.PHASES.reset;
@@ -289,9 +289,9 @@ class GameState extends State {
         }
       }
     } else {
-      this.redTeam.update(this.groupTick, this.blueTeam.getLivingPlayers(), this.map);
-      this.blueTeam.update(this.groupTick, this.redTeam.getLivingPlayers(), this.map);
-      this.map.update(this.groupTick, this.redTeam.getLivingPlayers(), this.blueTeam.getLivingPlayers());
+      this.redTeam.update(this.groupTick, this.blueTeam.players, this.map);
+      this.blueTeam.update(this.groupTick, this.redTeam.players, this.map);
+      this.map.update(this.groupTick, this.redTeam.players, this.blueTeam.players);
       this.groupTick += 1;
       if (this.groupTick >= GameState.MAX_GROUP_TICK) {
         this.currentPhase = GameState.PHASES.reset;

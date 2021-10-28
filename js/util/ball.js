@@ -42,7 +42,16 @@ class Ball {
     }
     return dist < targetBall.radius * targetBall.radius;
   };
-  static vsBalls(ball, balls) {
+  static resolveBallCollision(ball, target) {
+    let potentialPosition = ball.pos.add(ball.vel);
+    if (target.id != ball.id && target.hasCollision && target.vsCircle(potentialPosition, ball.radius)) {
+      let distanceBetween = Math.hypot(target.pos.x - potentialPosition.x, target.pos.y - potentialPosition.y);
+      let overlap = (distanceBetween - ball.radius - target.radius);
+      potentialPosition = potentialPosition.sub(potentialPosition.sub(target.pos).mul(overlap).div(distanceBetween));
+      ball.vel = Vector.fromAngle(ball.pos.getAngle(potentialPosition)).normalize().mul(ball.pos.getDistance(potentialPosition));
+    }
+  };
+  static resolveBallCollisions(ball, balls) {
     for (let i = 0; i < balls.length; i++) {
       let potentialPosition = ball.pos.add(ball.vel);
       if (balls[i].id != ball.id && balls[i].hasCollision && balls[i].vsCircle(potentialPosition, ball.radius)) {
