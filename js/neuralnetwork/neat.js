@@ -7,9 +7,6 @@ class Neat {
     this.mutationChance = 0.001;
     this.mutationAmount = 0.01;
     this.mutationCritical = 0.00001;
-    this.generation = 0;
-    this.pickTop1 = 0.1;
-    this.pickTop2 = 0.5;
     this.brains = [];
     for (let i = 0; i < this.populationSize; i++) {
       this.brains.push(new Brain(this.dimensions));
@@ -49,7 +46,6 @@ class Neat {
       newBrains.push(newBrain);
     }
     this.brains = newBrains;
-    this.generation += 1;
   };
   pickOne() {
 		let index = 0;

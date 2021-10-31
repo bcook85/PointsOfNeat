@@ -32,9 +32,10 @@ class Player extends Ball {
     ,"inControlPointRadius": 0.25
     ,"alive": 0.0001
     ,"distance": 0.01
+    ,"attackPenalty": -0.0001
   };
 
-  constructor(teamId, position, image) {
+  constructor(teamId, position, image, idImage) {
     super(position, 0.5);
 
     // Stats
@@ -53,6 +54,7 @@ class Player extends Ball {
 
     // Render
     this.image = image;
+    this.idImage = idImage;
 
     // Ranged Attack
     this.attack = 0; // desire to attack
@@ -99,6 +101,14 @@ class Player extends Ball {
     ctx.translate(
       Math.floor((this.pos.x * scale) + offset.x)
       ,Math.floor((this.pos.y * scale) + offset.y)
+    );
+    // Draw Id Image
+    ctx.drawImage(
+      this.idImage
+      ,0 ,0
+      ,this.idImage.width, this.idImage.height
+      ,Math.floor(scale * -1), Math.floor(scale * -1)
+      ,Math.floor(scale * 0.5), Math.floor(scale * 0.5)
     );
     // Health Bar
     ctx.fillStyle = "rgb(0,0,0)";
@@ -300,9 +310,9 @@ class Player extends Ball {
       this.visionInputs[r * 2] = currentVisionType;
       this.visionInputs[(r * 2) + 1] = Math.max(0, Math.min(maxDistance / Player.VIEW_DISTANCE, 1));
     }
-    // Player Health, 18
+    // Player Health
     this.visionInputs[(Player.VISION_RAYS.length * 2)] = this.hp / this.maxHP;
-    // Is Capping a Control Point, 19
+    // Is Capping a Control Point
     this.visionInputs[(Player.VISION_RAYS.length * 2) + 1] = this.isCapping;
     // Recurrence
     this.visionInputs[(Player.VISION_RAYS.length * 2) + 2] = this.recurrence[0];

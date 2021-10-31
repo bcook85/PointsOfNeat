@@ -20,14 +20,14 @@ class Team {
     this.neatGroup = 0;
     this.displayVision = false;
   };
-  initPlayers() {
+  initPlayers(playerIdImages) {
     this.players = [];
     for (let i = 0; i < Team.MAX_PLAYERS; i++) {
       this.players.push(new Player(
         this.teamId
         ,new Vector(this.spawnLocation.x + 0.5, this.spawnLocation.y + 0.5)
         ,this.playerImage
-        //,displayId = i + 1
+        ,playerIdImages[i]
       ));
     }
   };
@@ -107,6 +107,7 @@ class Team {
         // Player Attack
         if (this.players[i].canAttack(gameTick)) {
           this.players[i].attackLast = gameTick;
+          this.players[i].score += Player.POINTS.attackPenalty;
           this.createBullet(i, this.players[i].pos, this.players[i].direction);
         }
       } else if (gameTick >= this.players[i].deadLast + Team.RESPAWN_TIME) {
