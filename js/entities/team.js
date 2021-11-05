@@ -93,7 +93,7 @@ class Team {
       if (this.players[i].alive) {
         // Neural Network
         this.players[i].score += Player.POINTS.alive;
-        this.players[i].processVision(this.players, enemies, map);
+        this.players[i].processVision(this.players, enemies, map, gameTick);
         this.players[i].processControlInputs(
           this.neats[i].processInput(this.neatGroup, this.players[i].visionInputs)
         );
@@ -107,7 +107,6 @@ class Team {
         // Player Attack
         if (this.players[i].canAttack(gameTick)) {
           this.players[i].attackLast = gameTick;
-          this.players[i].score += Player.POINTS.attackPenalty;
           this.createBullet(i, this.players[i].pos, this.players[i].direction);
         }
       } else if (gameTick >= this.players[i].deadLast + Team.RESPAWN_TIME) {

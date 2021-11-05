@@ -23,16 +23,15 @@ class Player extends Ball {
     ,"controlPointTeam": 0.8
     ,"controlPointEnemy": 1
   };
-  static INFO_INPUT_COUNT = 5;// HP & isCapping + recurrence*2 + bias
-  static MAX_INPUTS = (Player.VISION_RAYS.length * 2) + Player.INFO_INPUT_COUNT;
-  static MAX_OUTPUTS = 9;
+  static INFO_INPUT_COUNT = 6;// = 1hp + 1isCapping +1attackCooldown + 2recurrence + 1bias
+  static MAX_INPUTS = (Player.VISION_RAYS.length * 2) + Player.INFO_INPUT_COUNT;// = typesCount + distancesCount + infoCount
+  static MAX_OUTPUTS = 9;// = 1tLeft + 1tRight + 1forward + 1back + 1sLeft + 1sRight + 1attack + 2recurrence
   static VIEW_DISTANCE = 12.0;
   static POINTS = {
-    "damageEnemy": 10
-    ,"inControlPointRadius": 0.25
+    "damageEnemy": 25
+    ,"inControlPointRadius": 0.2
     ,"alive": 0.0001
     ,"distance": 0.01
-    ,"attackPenalty": -0.0001
   };
 
   constructor(teamId, position, image, idImage) {
@@ -47,6 +46,7 @@ class Player extends Ball {
     this.moveSpeed = 0.08;
     this.turnSpeed = Math.PI / 12;
     this.direction = Math.random() * Math.PI * 2;
+    this.turning = 0;
     this.home = new Vector(this.pos.x, this.pos.y);
 
     // Control Points
@@ -58,8 +58,8 @@ class Player extends Ball {
 
     // Ranged Attack
     this.attack = 0; // desire to attack
-    this.attackLast = -Infinity;
     this.attackCooldown = 15;
+    this.attackLast = -this.attackCooldown;
 
     // Score
     this.score = 0;
@@ -75,6 +75,7 @@ class Player extends Ball {
     this.pos = new Vector(this.home.x, this.home.y);
     this.vel = new Vector(0.0, 0.0);
     this.direction = Math.random() * Math.PI * 2;
+    this.turning = 0;
     // Controls
     this.recurrence = new Array(2).fill(0.0);
     // Stats
@@ -82,17 +83,18 @@ class Player extends Ball {
     this.alive = true;
     this.score = 0;
     this.maxDistance = 0;
-    this.attackLast = -Infinity;
+    this.attackLast = -this.attackCooldown;
     this.deadLast = -Infinity;
   };
   respawn() {
     this.pos = new Vector(this.home.x, this.home.y);
     this.vel = new Vector(0.0, 0.0);
     this.direction = Math.random() * Math.PI * 2;
+    this.turning = 0;
     // Stats
     this.hp = this.maxHP;
     this.alive = true;
-    this.attackLast = -Infinity;
+    this.attackLast = -this.attackCooldown;
     this.deadLast = -Infinity;
   };
   render(ctx, offset, scale) {
@@ -107,7 +109,7 @@ class Player extends Ball {
       this.idImage
       ,0 ,0
       ,this.idImage.width, this.idImage.height
-      ,Math.floor(scale * -1), Math.floor(scale * -1)
+      ,Math.floor(scale * -1) - 1, Math.floor(scale * -1)
       ,Math.floor(scale * 0.5), Math.floor(scale * 0.5)
     );
     // Health Bar
@@ -164,26 +166,22 @@ class Player extends Ball {
     }
   };
   update(gameTick, allies, enemies, map) {
-    this.move(map, enemies);
-    // Distance From Home
-    let currentDistance = this.home.sub(this.pos).mag2();
-    if (currentDistance > this.maxDistance) {
-      this.score += Player.POINTS.distance;
-      this.maxDistance = currentDistance;
+    if (gameTick >= this.attackLast + this.attackCooldown) {
+      this.move(map, enemies);
+      // Distance From Home
+      let currentDistance = this.home.sub(this.pos).mag2();
+      if (currentDistance > this.maxDistance) {
+        this.score += Player.POINTS.distance;
+        this.maxDistance = currentDistance;
+      }
     }
     this.controlPointInteraction(map);
   };
   processControlInputs(controlInputs) {
     this.controlInputs = controlInputs;
     /* [turnLeft, turnRight, moveForward, moveBackward, strafeLeft, strafeRight, attack, recurrence1, recurrence2] */
-
     // Controls - Turning
-    this.direction += this.turnSpeed * (this.controlInputs[0] - this.controlInputs[1]);
-    if (this.direction < -Math.PI) {
-      this.direction += Math.PI * 2;
-    } else if (this.direction > Math.PI) {
-      this.direction -= Math.PI * 2;
-    }
+    this.turning = this.turnSpeed * (this.controlInputs[0] - this.controlInputs[1]);
     // Controls - Movement
     let movement = new Vector(
       this.controlInputs[4] - this.controlInputs[5] // Strafing
@@ -197,6 +195,13 @@ class Player extends Ball {
     this.vel = movement.normalize().rot(this.direction).mul(this.moveSpeed);
   };
   move(map, enemies) {
+    // Turning
+    this.direction += this.turning;
+    if (this.direction < -Math.PI) {
+      this.direction += Math.PI * 2;
+    } else if (this.direction > Math.PI) {
+      this.direction -= Math.PI * 2;
+    }
     // Collision to adjust velocity
     for (let i = 0; i < map.controlPoints.length; i++) {
       Ball.resolveBallCollision(this, map.controlPoints[i]);
@@ -238,7 +243,7 @@ class Player extends Ball {
       this.deadLast = gameTick;
     }
   };
-  processVision(allies, enemies, map) {
+  processVision(allies, enemies, map, gameTick) {
     // Vision Inputs
     for (let r = 0; r < Player.VISION_RAYS.length; r++) {
       let playerDir = this.direction + Player.VISION_RAYS[r];
@@ -314,10 +319,12 @@ class Player extends Ball {
     this.visionInputs[(Player.VISION_RAYS.length * 2)] = this.hp / this.maxHP;
     // Is Capping a Control Point
     this.visionInputs[(Player.VISION_RAYS.length * 2) + 1] = this.isCapping;
+    // Attack Cooldown
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 2] = Math.max(0, Math.min(1, (gameTick - this.attackLast) / this.attackCooldown));
     // Recurrence
-    this.visionInputs[(Player.VISION_RAYS.length * 2) + 2] = this.recurrence[0];
-    this.visionInputs[(Player.VISION_RAYS.length * 2) + 3] = this.recurrence[1];
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 3] = this.recurrence[0];
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 4] = this.recurrence[1];
     // Bias of 1
-    this.visionInputs[(Player.VISION_RAYS.length * 2) + 4] = 1;
+    this.visionInputs[(Player.VISION_RAYS.length * 2) + 5] = 1;
   };
 };

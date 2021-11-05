@@ -4,9 +4,9 @@ class Neat {
   constructor(populationSize, dimensions) {
     this.populationSize = populationSize;
     this.dimensions = dimensions;
-    this.mutationChance = 0.001;
-    this.mutationAmount = 0.01;
-    this.mutationCritical = 0.00001;
+    this.mutationChance = 0.01;
+    this.mutationScale = 0.1;
+    this.mutationCritical = 0.0001;
     this.brains = [];
     for (let i = 0; i < this.populationSize; i++) {
       this.brains.push(new Brain(this.dimensions));
@@ -94,12 +94,12 @@ class Neat {
       value = (Math.random() * 2) - 1;
     } else if (Math.random() <= this.mutationChance) {
       if (Math.random() <= 0.5) {
-        value += this.mutationAmount;
+        value += this.mutationScale * Math.random();
         if (value > 1) {
           value = 1;
         }
       } else {
-        value -= this.mutationAmount;
+        value -= this.mutationScale * Math.random();
         if (value < -1) {
           value = -1;
         }

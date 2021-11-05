@@ -16,7 +16,7 @@ This game uses Neuroevolution with Augmenting Topologies (NEAT) to evolve a popu
 Each population contains 100 "brains", all evolving as one species. Games are played in groups, one for each in the population.
 Each brain group is allowed to play the game once and its performance is scored.
 Once every brain in the population has played and been scored, fitness is calculated and a new generation of brains is created.
-Each neural network has 27 inputs, a hidden layer of 17, a hidden layer of 10, and finally 9 outputs.
+Each neural network has 28 inputs, a hidden layer of 17, a hidden layer of 10, and finally 9 outputs.
 Player vision consists of 11 casted rays spread out in a 180 degree field of view.
 
 # Map Editor

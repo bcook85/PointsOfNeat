@@ -328,6 +328,7 @@ class GameState extends State {
     // Set Neat Group for next group
     this.redTeam.setNeatGroup(this.neatGroup);
     this.blueTeam.setNeatGroup(this.neatGroup);
+    // And restart
     this.currentPhase = GameState.PHASES.play;
   };
   saveNeats() {
